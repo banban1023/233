@@ -1,22 +1,31 @@
 <template>
   <div class="waterfall-container">
-    <div class="waterfall">
-      <div v-for="item in list"
-        :key="item.id"
-        class="card"
-        ref="card"
-      >
-        <div class="card-content">
-          <div class="image-wrapper">
-            <img :src="item.url" :alt="item.title" class="card-image" @load="handleImageLoad">
-          </div>
-          <div class="card-info">
-            <h3 class="card-title">{{ item.title }}</h3>
-            <p class="card-desc">{{ item.description }}</p>
+    <van-pull-refresh
+      v-model="refreshing"
+      @refresh="onRefresh"
+      :head-height="50"
+      success-text="刷新成功"
+      animation-duration="300"
+      class="pull-refresh-container"
+    >
+      <div class="waterfall">
+        <div v-for="item in list"
+          :key="item.id"
+          class="card"
+          ref="card"
+        >
+          <div class="card-content">
+            <div class="image-wrapper">
+              <img :src="item.url" :alt="item.title" class="card-image" @load="handleImageLoad">
+            </div>
+            <div class="card-info">
+              <h3 class="card-title">{{ item.title }}</h3>
+              <p class="card-desc">{{ item.description }}</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </van-pull-refresh>
     <!-- Loading 提示 -->
     <div class="loading-tip" v-show="isLoading">
       <van-loading size="24px" vertical>加载中...</van-loading>
@@ -30,12 +39,13 @@
 
 <script>
 import axios from 'axios'
-import { Loading } from 'vant'
+import { Loading, PullRefresh } from 'vant'
 
 export default {
   name: 'WaterfallCard',
   components: {
-    [Loading.name]: Loading
+    [Loading.name]: Loading,
+    [PullRefresh.name]: PullRefresh
   },
   data () {
     return {
@@ -43,7 +53,8 @@ export default {
       isLoading: false,
       page: 1,
       isBottom: false,
-      scrollTimer: null
+      scrollTimer: null,
+      refreshing: false
     }
   },
   methods: {
@@ -109,6 +120,19 @@ export default {
           fn()
         }, delay)
       }
+    },
+    async onRefresh () {
+      try {
+        this.page = 1
+        this.isBottom = false
+        this.list = []
+
+        await this.fetchData()
+      } catch (error) {
+        console.error('刷新失败:', error)
+      } finally {
+        this.refreshing = false
+      }
     }
   },
   mounted () {
@@ -133,17 +157,14 @@ export default {
   box-sizing: border-box;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(2, calc(50% - 8px));
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
   align-items: start;
   justify-content: space-evenly;
-  grid-auto-rows: 5px;
-  gap: 16px;
   padding: 16px;
 
   .card {
     background-color: #fff;
-    border-radius: 8px;
-    overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
 
@@ -204,5 +225,23 @@ export default {
   padding: 20px 0;
   color: #999;
   font-size: 14px;
+}
+
+.pull-refresh-container {
+  overflow: visible;
+  text-align: center;
+  position: relative;
+  :deep(.van-pull-refresh__track) {
+    overflow: visible;
+  }
+
+  :deep(.van-pull-refresh__head) {
+    position: absolute;
+    top: 10px; // 保持 10px 的间距
+    left: 0;
+    right: 0;
+    margin-bottom: -10px;
+    text-align: center; // 确保文字居中
+  }
 }
 </style>
