@@ -21,6 +21,13 @@
             <div class="card-info">
               <h3 class="card-title">{{ item.title }}</h3>
               <p class="card-desc">{{ item.description }}</p>
+              <div class="user-info">
+                <div class="user">
+                  <img src="@/assets/头像.png" alt="用户头像" class="user-avatar">
+                  <span class="user-id">{{ item.userId }}111</span>
+                </div>
+                <button class="like-button">👍</button>
+              </div>
             </div>
           </div>
         </div>
@@ -157,10 +164,11 @@ export default {
   box-sizing: border-box;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(2, calc(50% - 8px));
   align-items: start;
   justify-content: space-evenly;
+  grid-auto-rows: 4px;
+  gap: 16px;
   padding: 16px;
 
   .card {
@@ -198,16 +206,49 @@ export default {
           font-size: 16px;
           font-weight: bold;
           color: #333;
-        }
-
-        .card-desc {
-          margin: 8px 0 0;
-          font-size: 14px;
-          color: #666;
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+
+        .card-desc {
+          margin: 4px 0;
+          font-size: 12px;
+          color: #999;
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        .user-info {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .user {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .user-avatar {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          margin-right: 5px;
+        }
+
+        .user-id {
+          font-size: 12px;
+          color: #666;
+        }
+
+        .like-button {
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-size: 14px;
         }
       }
     }
@@ -237,7 +278,7 @@ export default {
 
   :deep(.van-pull-refresh__head) {
     position: absolute;
-    top: 10px; // 保持 10px 的间距
+    top: -10px;
     left: 0;
     right: 0;
     margin-bottom: -10px;
